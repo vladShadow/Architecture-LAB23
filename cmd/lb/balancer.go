@@ -4,9 +4,11 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"hash/fnv"
 	"io"
 	"log"
 	"net/http"
+	"sync"
 	"time"
 
 	"github.com/vladShadow/Architecture-LAB23/httptools"
@@ -23,12 +25,23 @@ var (
 
 var (
 	timeout     = time.Duration(*timeoutSec) * time.Second
-	serversPool = []string{
+	serversList = []string{
 		"server1:8080",
 		"server2:8080",
 		"server3:8080",
 	}
+	serversPool = []string{}
+	poolMutex   sync.Mutex
 )
+
+func indexOf(arr []string, str string) int {
+	for i, n := range arr {
+		if str == n {
+			return i
+		}
+	}
+	return -1
+}
 
 func scheme() string {
 	if *https {
@@ -84,22 +97,49 @@ func forward(dst string, rw http.ResponseWriter, r *http.Request) error {
 	}
 }
 
+func getIndexByClient(addr string, len int) int {
+	poolIdx := hash(addr) % len
+	return indexOf(serversList, serversPool[poolIdx])
+}
+
+func hash(str string) int {
+	temp := fnv.New32a()
+	temp.Write([]byte(str))
+	return int(temp.Sum32())
+}
+
 func main() {
 	flag.Parse()
 
 	// TODO: Використовуйте дані про стан сервреа, щоб підтримувати список тих серверів, яким можна відправляти ззапит.
-	for _, server := range serversPool {
+	for _, server := range serversList {
+		// ітерація по всіх серверах та підтримка пулу лише доступних серверів
 		server := server
 		go func() {
 			for range time.Tick(10 * time.Second) {
-				log.Println(server, health(server))
+				serverAvailable := health(server)
+				poolMutex.Lock()
+				idx := indexOf(serversPool, server)
+				if serverAvailable && idx == -1 {
+					serversPool = append(serversPool, server)
+				}
+				if !serverAvailable && idx != -1 {
+					lastIdx := len(serversPool) - 1
+					serversPool[idx] = serversPool[lastIdx]
+					serversPool[lastIdx] = ""
+				}
+				poolMutex.Unlock()
+				log.Println(server, serverAvailable)
 			}
 		}()
 	}
 
 	frontend := httptools.CreateServer(*port, http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 		// TODO: Рееалізуйте свій алгоритм балансувальника.
-		forward(serversPool[0], rw, r)
+		serverIndex := getIndexByClient(r.RemoteAddr, len(serversPool))
+		// індекс у повному списку серверів
+		log.Println("serverIndex", serverIndex)
+		forward(serversList[serverIndex], rw, r)
 	}))
 
 	log.Println("Starting load balancer...")
