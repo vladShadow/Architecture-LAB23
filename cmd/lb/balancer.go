@@ -98,6 +98,10 @@ func forward(dst string, rw http.ResponseWriter, r *http.Request) error {
 }
 
 func getIndexByClient(addr string, len int) int {
+	if len == 0 {
+		log.Println("Failed to process the request: All servers are dead")
+		return -1
+	}
 	poolIdx := hash(addr) % len
 	poolMutex.Lock()
 	idx := indexOf(serversList, serversPool[poolIdx])
@@ -141,7 +145,7 @@ func main() {
 		// TODO: Рееалізуйте свій алгоритм балансувальника.
 		serverIndex := getIndexByClient(r.RemoteAddr, len(serversPool))
 		// індекс у повному списку серверів
-		log.Println("serverIndex", serverIndex)
+		log.Println("serverIndex ", serverIndex)
 		forward(serversList[serverIndex], rw, r)
 	}))
 
