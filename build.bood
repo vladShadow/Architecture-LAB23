@@ -17,8 +17,13 @@ go_binary {
     "httptools/**/*.go",
     "signal/**/*.go",
     "cmd/lb/*.go"
-  ]
+  ],
   // TODO: Додайте запуск тестів для балансувальника.
+   testPkg:"github.com/vladShadow/Architecture-LAB23/cmd/lb"
 }
 
 // TODO: Додайте модуль для інтеграційних тестів.
+go_binary {
+  name: "integration",
+  testPkg: "github.com/vladShadow/Architecture-LAB23/integration",
+} 

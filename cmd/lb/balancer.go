@@ -99,7 +99,10 @@ func forward(dst string, rw http.ResponseWriter, r *http.Request) error {
 
 func getIndexByClient(addr string, len int) int {
 	poolIdx := hash(addr) % len
-	return indexOf(serversList, serversPool[poolIdx])
+	poolMutex.Lock()
+	idx := indexOf(serversList, serversPool[poolIdx])
+	poolMutex.Unlock()
+	return idx
 }
 
 func hash(str string) int {
