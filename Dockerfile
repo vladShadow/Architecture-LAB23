@@ -13,7 +13,7 @@ RUN CGO_ENABLED=0 bood
 # ==== Final image ====
 FROM alpine:3.11
 WORKDIR /opt/GO23
-COPY entry.sh ./
+#COPY entry.sh ./
 COPY --from=build /go/src/GO23/out/bin/* ./
-ENTRYPOINT ["/opt/GO23/entry.sh"]
-CMD ["server"]
+#ENTRYPOINT ["/bin/bash", "/opt/GO23/entry.sh"]
+#CMD ["server"]
