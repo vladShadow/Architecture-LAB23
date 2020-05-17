@@ -8,11 +8,10 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"sync"
 	"time"
 
-	"github.com/vladShadow/Architecture-LAB23/httptools"
-	"github.com/vladShadow/Architecture-LAB23/signal"
+	"github.com/Tornado9966/Lab3_Go/httptools"
+	"github.com/Tornado9966/Lab3_Go/signal"
 )
 
 var (
@@ -21,17 +20,11 @@ var (
 	https      = flag.Bool("https", false, "whether backends support HTTPs")
 
 	traceEnabled = flag.Bool("trace", false, "whether to include tracing information into responses")
-)
 
-var (
-	timeout     = time.Duration(*timeoutSec) * time.Second
-	serversList = []string{
-		"server1:8080",
-		"server2:8080",
-		"server3:8080",
-	}
-	serversPool = []string{}
-	poolMutex   sync.Mutex
+	timeout = time.Duration(*timeoutSec) * time.Second
+
+	serversPool        map[int]string
+	healthyServersPool []int
 )
 
 func scheme() string {
@@ -88,65 +81,78 @@ func forward(dst string, rw http.ResponseWriter, r *http.Request) error {
 	}
 }
 
-func indexOf(arr []string, str string) int {
-	for i, n := range arr {
-		if str == n {
-			return i
+func hash(s string) int {
+	h := fnv.New32a()
+	h.Write([]byte(s))
+	return (int)(h.Sum32())
+}
+
+func find(slice []int, key int) (int, bool) {
+	for i, item := range slice {
+		if item == key {
+			return i, true
 		}
 	}
-	return -1
+	return -1, false
 }
 
-func getIndexByClient(addr string, len int) int {
-	if len == 0 {
-		log.Println("Failed to process the request: All servers are dead")
-		return -1
+func remove(slice []int, key int) []int {
+	if i, exist := find(slice, key); exist {
+		return append(slice[:i], slice[i+1:]...)
 	}
-	poolIdx := hash(addr) % len
-	poolMutex.Lock()
-	idx := indexOf(serversList, serversPool[poolIdx])
-	poolMutex.Unlock()
-	return idx
+	return slice
 }
 
-func hash(str string) int {
-	temp := fnv.New32a()
-	temp.Write([]byte(str))
-	return int(temp.Sum32())
+func checkServer(server string, key int) {
+	healthy := health(server)
+	log.Println(server, healthy)
+	if healthy {
+		if _, exist := find(healthyServersPool, key); !exist {
+			healthyServersPool = append(healthyServersPool, key)
+		}
+	} else {
+		healthyServersPool = remove(healthyServersPool, key)
+	}
+}
+
+func chooseServer(addr string) string {
+	hash := hash(addr)
+	if _, exist := find(healthyServersPool, hash%len(serversPool)); exist {
+		return serversPool[hash%len(serversPool)]
+	} else {
+		return serversPool[healthyServersPool[hash%len(healthyServersPool)]]
+	}
 }
 
 func main() {
 	flag.Parse()
 
-	// TODO: Використовуйте дані про стан сервреа, щоб підтримувати список тих серверів, яким можна відправляти ззапит.
-	for _, server := range serversList {
-		// ітерація по всіх серверах та підтримка пулу лише доступних серверів
+	serversPool = make(map[int]string)
+
+	serversPool[0] = "server1:8080"
+	serversPool[1] = "server2:8080"
+	serversPool[2] = "server3:8080"
+
+	checkServer("server1:8080", 0)
+	checkServer("server2:8080", 1)
+	checkServer("server3:8080", 2)
+
+	for key, server := range serversPool {
 		server := server
+		key := key
 		go func() {
 			for range time.Tick(10 * time.Second) {
-				serverAvailable := health(server)
-				poolMutex.Lock()
-				idx := indexOf(serversPool, server)
-				if serverAvailable && idx == -1 {
-					serversPool = append(serversPool, server)
-				}
-				if !serverAvailable && idx != -1 {
-					lastIdx := len(serversPool) - 1
-					serversPool[idx] = serversPool[lastIdx]
-					serversPool[lastIdx] = ""
-				}
-				poolMutex.Unlock()
-				log.Println(server, serverAvailable)
+				checkServer(server, key)
 			}
 		}()
 	}
 
 	frontend := httptools.CreateServer(*port, http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
-		// TODO: Рееалізуйте свій алгоритм балансувальника.
-		serverIndex := getIndexByClient(r.RemoteAddr, len(serversPool))
-		// індекс у повному списку серверів
-		log.Println("serverIndex ", serverIndex)
-		forward(serversList[serverIndex], rw, r)
+		if len(healthyServersPool) != 0 {
+			forward(chooseServer(r.RemoteAddr), rw, r)
+		} else {
+			log.Println("All servers are busy. Wait please.")
+		}
 	}))
 
 	log.Println("Starting load balancer...")
