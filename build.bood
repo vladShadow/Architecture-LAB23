@@ -30,4 +30,5 @@ go_binary {
   name: "integration",
   testPkg: "github.com/vladShadow/Architecture-LAB23/integration",
   optional: true
+  outTestFile: "inttest.txt" 
 } 
