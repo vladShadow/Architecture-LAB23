@@ -64,7 +64,7 @@ func (s *MySuite) TestBalancer(c *C) {
 }
 
 func BenchmarkBalancer(b *testing.B) {
-	// TODO: Реалізуйте інтеграційний бенчмарк для балансувальникка
+	//Реалізовано інтеграційний бенчмарк для балансувальникка
 	for k := 0; k < b.N; k++ {
 		for i := 0; i < len(clients); i++ {
 			_, err := clients[i].Get(fmt.Sprintf("%s/api/v1/some-data", baseAddress))
