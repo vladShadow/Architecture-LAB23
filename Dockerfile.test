@@ -9,4 +9,4 @@ WORKDIR /go/src/GO23
 COPY . .
 
 # TODO: Замініть на запуск bood, який призводить до виконання інтеграційних тестів.
-ENTRYPOINT ["./tentry.sh"]
+ENTRYPOINT ["bood", "out/bin/inttest.txt"]
