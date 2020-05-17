@@ -57,7 +57,7 @@ func (s *MySuite) TestBalancer(c *C) {
 		}
 
 		counter++
-		if counter >= 100 {
+		if counter >= 10 {
 			break
 		}
 	}
