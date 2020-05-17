@@ -13,17 +13,17 @@ type MySuite struct{}
 
 var _ = Suite(&MySuite{})
 
-var clients = []string{
-	"client/address/1",
-	"another/client/address",
-	"last/but/not/least/client/address",
-}
-
 func (s *MySuite) TestBalancer(c *C) {
 	// TODO: Реалізуйте юніт-тест для балансувальникка.
 	// балансувальник визначає сервер по адресу клієнта
 	// тобто коли не відбувається зміна списку доступних серверів
 	// для одного клієнта буде використовуватись один і той же сервер
+
+	clients := []string{
+		"client/address/1",
+		"another/client/address",
+		"last/but/not/least/client/address",
+	}
 
 	// all servers alive
 	fmt.Println("start")
