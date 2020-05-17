@@ -3,7 +3,7 @@ FROM golang:1.14 as build
 RUN apt-get update && apt-get install -y ninja-build
 
 # TODO: Змініть на власну реалізацію системи збірки
-RUN go get -u github.com/vladShadow/Architecture-LAB22/build/cmd/bood
+RUN go get -u github.com/vladShadow/Architecture-LAB2/build/cmd/bood
 
 WORKDIR /go/src/GO23
 COPY . .
