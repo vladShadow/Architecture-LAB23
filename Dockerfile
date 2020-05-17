@@ -15,5 +15,5 @@ FROM alpine:3.11
 WORKDIR /opt/GO23
 COPY entry.sh ./
 COPY --from=build /go/src/GO23/out/bin/* ./
-ENTRYPOINT ["/opt/GO23/entry.sh"]
+ENTRYPOINT ["./entry.sh"]
 CMD ["server"]
