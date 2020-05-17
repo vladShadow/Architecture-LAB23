@@ -17,7 +17,7 @@ func (s *MySuite) TestBalancer(c *C) {
 	// балансувальник визначає сервер по адресу клієнта
 	// тобто коли не відбувається зміна списку доступних серверів
 	// для одного клієнта буде використовуватись один і той же сервер
-
+	c.Log("start")
 	clients := []string{
 		"client/address/1",
 		"another/client/address",
@@ -30,17 +30,19 @@ func (s *MySuite) TestBalancer(c *C) {
 		"server2:8080",
 		"server3:8080",
 	}
-	// var prevIndex int
-	// for i := 0; i < len(clients); i++ {
-	// 	for j := 0; i < 5; j++ {
-	// 		serverIndex := getIndexByClient(clients[i])
-	// 		if j != 0 {
-	// 			c.Assert(serverIndex, Equals, prevIndex)
-	// 		}
-	// 		prevIndex = serverIndex
-	// 	}
-	// }
-
+	var prevIndex int
+	for i := 0; i < len(clients); i++ {
+		for j := 0; i < 5; j++ {
+			c.Log("beforeget")
+			serverIndex := getIndexByClient(clients[i])
+			if j != 0 {
+				c.Log("beforeassert")
+				c.Assert(serverIndex, Equals, prevIndex)
+			}
+			prevIndex = serverIndex
+		}
+	}
+	c.Log("end")
 	// // only one alive
 	// serversPool = []string{
 	// 	"server1:8080",
