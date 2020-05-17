@@ -24,15 +24,15 @@ func (s *MySuite) TestBalancer(c *C) {
 		"172.20.0.2:34563"}
 
 	// all servers alive
-	// serversPool = []string{
-	// 	"server1:8080",
-	// 	"server2:8080",
-	// 	"server3:8080",
-	// }
+	serversPool = []string{
+		"server1:8080",
+		"server2:8080",
+		"server3:8080",
+	}
 	var prevIndex int
 	for i := 0; i < len(clients); i++ {
 		for j := 0; i < 5; j++ {
-			serverIndex := getIndexByClient(clients[i])
+			serverIndex := 1
 			if j != 0 {
 				c.Assert(serverIndex, Equals, prevIndex)
 			}
