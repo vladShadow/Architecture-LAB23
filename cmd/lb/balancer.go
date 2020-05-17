@@ -97,15 +97,14 @@ func indexOf(arr []string, str string) int {
 	return -1
 }
 
-func getIndexByClient(addr string, len int) int {
+func getIndexByClient(addr string) int {
+	len := len(serversPool)
 	if len == 0 {
 		log.Println("Failed to process the request: All servers are dead")
 		return -1
 	}
 	poolIdx := hash(addr) % len
-	poolMutex.Lock()
 	idx := indexOf(serversList, serversPool[poolIdx])
-	poolMutex.Unlock()
 	return idx
 }
 
@@ -125,7 +124,6 @@ func main() {
 		go func() {
 			for range time.Tick(10 * time.Second) {
 				serverAvailable := health(server)
-				poolMutex.Lock()
 				idx := indexOf(serversPool, server)
 				if serverAvailable && idx == -1 {
 					serversPool = append(serversPool, server)
@@ -135,7 +133,6 @@ func main() {
 					serversPool[idx] = serversPool[lastIdx]
 					serversPool[lastIdx] = ""
 				}
-				poolMutex.Unlock()
 				log.Println(server, serverAvailable)
 			}
 		}()
@@ -143,7 +140,7 @@ func main() {
 
 	frontend := httptools.CreateServer(*port, http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 		// TODO: Рееалізуйте свій алгоритм балансувальника.
-		serverIndex := getIndexByClient(r.RemoteAddr, len(serversPool))
+		serverIndex := getIndexByClient(r.RemoteAddr)
 		// індекс у повному списку серверів
 		log.Println("serverIndex ", serverIndex)
 		forward(serversList[serverIndex], rw, r)

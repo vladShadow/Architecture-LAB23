@@ -33,7 +33,7 @@ func (s *MySuite) TestBalancer(c *C) {
 	var prevIndex int
 	for i := 0; i < len(clients); i++ {
 		for j := 0; i < 5; j++ {
-			serverIndex := getIndexByClient(clients[i], len(serversPool))
+			serverIndex := getIndexByClient(clients[i])
 			if j != 0 {
 				c.Assert(serverIndex, Equals, prevIndex)
 			}
