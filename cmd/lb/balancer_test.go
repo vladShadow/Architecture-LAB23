@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"testing"
 
 	. "gopkg.in/check.v1"
@@ -25,11 +26,13 @@ func (s *MySuite) TestBalancer(c *C) {
 	// для одного клієнта буде використовуватись один і той же сервер
 
 	// all servers alive
-	// serversPool = []string{
-	// 	"server1:8080",
-	// 	"server2:8080",
-	// 	"server3:8080",
-	// }
+	fmt.Println("start")
+	serversPool = []string{
+		"server1:8080",
+		"server2:8080",
+		"server3:8080",
+	}
+	fmt.Println("start2")
 	var prevIndex int
 	for i := 0; i < len(clients); i++ {
 		for j := 0; i < 5; j++ {
@@ -40,7 +43,7 @@ func (s *MySuite) TestBalancer(c *C) {
 			prevIndex = serverIndex
 		}
 	}
-
+	fmt.Println("end")
 	// // only one alive
 	// serversPool = []string{
 	// 	"server1:8080",

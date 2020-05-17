@@ -104,7 +104,9 @@ func getIndexByClient(addr string) int {
 		return -1
 	}
 	poolIdx := hash(addr) % len
+	poolMutex.Lock()
 	idx := indexOf(serversList, serversPool[poolIdx])
+	poolMutex.Unlock()
 	return idx
 }
 
@@ -124,6 +126,7 @@ func main() {
 		go func() {
 			for range time.Tick(10 * time.Second) {
 				serverAvailable := health(server)
+				poolMutex.Lock()
 				idx := indexOf(serversPool, server)
 				if serverAvailable && idx == -1 {
 					serversPool = append(serversPool, server)
@@ -133,6 +136,7 @@ func main() {
 					serversPool[idx] = serversPool[lastIdx]
 					serversPool[lastIdx] = ""
 				}
+				poolMutex.Unlock()
 				log.Println(server, serverAvailable)
 			}
 		}()
