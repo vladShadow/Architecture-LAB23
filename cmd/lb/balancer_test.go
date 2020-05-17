@@ -25,11 +25,11 @@ func (s *MySuite) TestBalancer(c *C) {
 	// для одного клієнта буде використовуватись один і той же сервер
 
 	// all servers alive
-	serversPool = []string{
-		"server1:8080",
-		"server2:8080",
-		"server3:8080",
-	}
+	// serversPool = []string{
+	// 	"server1:8080",
+	// 	"server2:8080",
+	// 	"server3:8080",
+	// }
 	var prevIndex int
 	for i := 0; i < len(clients); i++ {
 		for j := 0; i < 5; j++ {
