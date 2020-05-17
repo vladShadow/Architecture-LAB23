@@ -32,7 +32,7 @@ go_binary {
   name: "integration",
   pkg: "github.com/vladShadow/Architecture-LAB23/integration",
   testPkg: "github.com/vladShadow/Architecture-LAB23/integration",
-  optional: true
+  optional: true,
   srcs: [],
   srcsExclude: ["**/*_test.go"],
   outTestFile: "inttest.txt" 
