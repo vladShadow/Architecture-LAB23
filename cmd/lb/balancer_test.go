@@ -19,10 +19,9 @@ func (s *MySuite) TestBalancer(c *C) {
 	// для одного клієнта буде використовуватись один і той же сервер
 
 	clients := []string{
-		"client/address/1",
-		"another/client/address",
-		"last/but/not/least/client/address",
-	}
+		"172.20.0.3:45234",
+		"172.20.0.4:34563",
+		"172.20.0.2:34563"}
 
 	// all servers alive
 	// serversPool = []string{
