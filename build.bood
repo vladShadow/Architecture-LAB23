@@ -1,11 +1,9 @@
 go_binary {
   name: "server",
-  pkg: "./cmd/server",
-  testPkg: "./cmd/server",
-  outTestFile: "testServer.txt", 
-
+  // TODO: Відкорегуйте ім'я пакета.
+  pkg: "github.com/vladShadow/Architecture-LAB23/cmd/server",
   srcs: [
-    "httptools/*.go",
+    "httptools/**/*.go",
     "signal/**/*.go",
     "cmd/server/*.go"
   ],
@@ -14,23 +12,22 @@ go_binary {
 
 go_binary {
   name: "lb",
-  pkg: "./cmd/lb",
-  testPkg: "./cmd/lb",
-  outTestFile: "testLb.txt",
+  // TODO: Відкорегуйте ім'я пакета.
+  pkg: "github.com/vladShadow/Architecture-LAB23/cmd/lb",
   srcs: [
-    "httptools/*.go",
+    "httptools/**/*.go",
     "signal/**/*.go",
     "cmd/lb/*.go"
   ],
-  srcsExclude: ["**/*_test.go"]
+  srcsExclude: ["**/*_test.go"],
+  // TODO: Додайте запуск тестів для балансувальника.
+  testPkg:"github.com/vladShadow/Architecture-LAB23/cmd/lb",
+  outTestFile: "lbtest.txt"  
 }
 
+// TODO: Додайте модуль для інтеграційних тестів.
 go_binary {
   name: "integration",
-  pkg: "./integration",
-  testPkg: "./integration",
-  outTestFile: "testIntegr.txt",
-  srcs: [],
-  srcsExclude: ["**/*_test.go"],
+  testPkg: "github.com/vladShadow/Architecture-LAB23/integration",
   optional: true
-}
+} 
