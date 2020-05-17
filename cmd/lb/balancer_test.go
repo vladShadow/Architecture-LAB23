@@ -24,28 +24,22 @@ func (s *MySuite) TestBalancer(c *C) {
 	// тобто коли не відбувається зміна списку доступних серверів
 	// для одного клієнта буде використовуватись один і той же сервер
 
-	// serversList = []string{
-	// 	"server1:8080",
-	// 	"server2:8080",
-	// 	"server3:8080",
-	// }
-
-	// // all servers alive
-	// serversPool = []string{
-	// 	"server1:8080",
-	// 	"server2:8080",
-	// 	"server3:8080",
-	// }
-	// var prevIndex int
-	// for i := 0; i < len(clients); i++ {
-	// 	for j := 0; i < 5; j++ {
-	// 		serverIndex := getIndexByClient(clients[i], len(serversPool))
-	// 		if j != 0 {
-	// 			c.Assert(serverIndex, Equals, prevIndex)
-	// 		}
-	// 		prevIndex = serverIndex
-	// 	}
-	// }
+	// all servers alive
+	serversPool = []string{
+		"server1:8080",
+		"server2:8080",
+		"server3:8080",
+	}
+	var prevIndex int
+	for i := 0; i < len(clients); i++ {
+		for j := 0; i < 5; j++ {
+			serverIndex := getIndexByClient(clients[i], len(serversPool))
+			if j != 0 {
+				c.Assert(serverIndex, Equals, prevIndex)
+			}
+			prevIndex = serverIndex
+		}
+	}
 
 	// // only one alive
 	// serversPool = []string{
