@@ -143,9 +143,7 @@ func main() {
 	}
 
 	frontend := httptools.CreateServer(*port, http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
-		// TODO: Рееалізуйте свій алгоритм балансувальника.
 		serverIndex := getIndexByClient(r.RemoteAddr)
-		// індекс у повному списку серверів
 		log.Println("serverIndex ", serverIndex)
 		forward(serversList[serverIndex], rw, r)
 	}))
