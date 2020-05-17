@@ -34,15 +34,6 @@ var (
 	poolMutex   sync.Mutex
 )
 
-func indexOf(arr []string, str string) int {
-	for i, n := range arr {
-		if str == n {
-			return i
-		}
-	}
-	return -1
-}
-
 func scheme() string {
 	if *https {
 		return "https"
@@ -95,6 +86,15 @@ func forward(dst string, rw http.ResponseWriter, r *http.Request) error {
 		rw.WriteHeader(http.StatusServiceUnavailable)
 		return err
 	}
+}
+
+func indexOf(arr []string, str string) int {
+	for i, n := range arr {
+		if str == n {
+			return i
+		}
+	}
+	return -1
 }
 
 func getIndexByClient(addr string, len int) int {
