@@ -1,3 +1,3 @@
 #!/usr/bin/env sh
 
-bood out/bin/testIntegr.txt
+bood out/bin/inttest.txt
