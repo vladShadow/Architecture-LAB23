@@ -19,9 +19,10 @@ func (s *MySuite) TestBalancer(c *C) {
 	// для одного клієнта буде використовуватись один і той же сервер
 
 	clients := []string{
-		"172.20.0.3:45234",
-		"172.20.0.4:34563",
-		"172.20.0.2:34563"}
+		"clientaddress1",
+		"anotherclientaddress",
+		"lastbutnotleastclientaddress",
+	}
 
 	// all servers alive
 	serversPool = []string{
@@ -31,8 +32,8 @@ func (s *MySuite) TestBalancer(c *C) {
 	}
 	var prevIndex int
 	for i := 0; i < len(clients); i++ {
-		for j := 0; i < 5; j++ {
-			serverIndex := 1
+		for j := 0; j < 5; j++ {
+			serverIndex := getIndexByClient(clients[i])
 			if j != 0 {
 				c.Assert(serverIndex, Equals, prevIndex)
 			}
@@ -40,26 +41,26 @@ func (s *MySuite) TestBalancer(c *C) {
 		}
 	}
 
-	// // only one alive
-	// serversPool = []string{
-	// 	"server1:8080",
-	// }
-	// for i := 0; i < len(clients); i++ {
-	// 	for j := 0; i < 5; j++ {
-	// 		serverIndex := getIndexByClient(clients[i], len(serversPool))
-	// 		if j != 0 {
-	// 			c.Assert(serverIndex, Equals, prevIndex)
-	// 		}
-	// 		prevIndex = serverIndex
-	// 	}
-	// }
+	// only one alive
+	serversPool = []string{
+		"server1:8080",
+	}
+	for i := 0; i < len(clients); i++ {
+		for j := 0; j < 5; j++ {
+			serverIndex := getIndexByClient(clients[i])
+			if j != 0 {
+				c.Assert(serverIndex, Equals, prevIndex)
+			}
+			prevIndex = serverIndex
+		}
+	}
 
-	// // none alive
-	// serversPool = []string{}
-	// for i := 0; i < len(clients); i++ {
-	// 	for j := 0; i < 5; j++ {
-	// 		serverIndex := getIndexByClient(clients[i], len(serversPool))
-	// 		c.Assert(serverIndex, Equals, -1)
-	// 	}
-	// }
+	// none alive
+	serversPool = []string{}
+	for i := 0; i < len(clients); i++ {
+		for j := 0; j < 5; j++ {
+			serverIndex := getIndexByClient(clients[i])
+			c.Assert(serverIndex, Equals, -1)
+		}
+	}
 }
