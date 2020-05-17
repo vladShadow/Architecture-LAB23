@@ -14,7 +14,7 @@ type Server interface {
 type server struct {
 	httpServer *http.Server
 }
-//Старт серверу
+
 func (s server) Start() {
 	go func() {
 		log.Println("Staring the HTTP server...")
@@ -22,7 +22,7 @@ func (s server) Start() {
 		log.Fatalf("HTTP server finished: %s. Finishing the process.", err)
 	}()
 }
-//Створення серверу
+
 func CreateServer(port int, handler http.Handler) Server {
 	return server{
 		httpServer: &http.Server{
