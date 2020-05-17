@@ -6,7 +6,8 @@ go_binary {
     "httptools/**/*.go",
     "signal/**/*.go",
     "cmd/server/*.go"
-  ]
+  ],
+  srcsExclude: ["**/*_test.go"]
 }
 
 go_binary {
@@ -18,12 +19,15 @@ go_binary {
     "signal/**/*.go",
     "cmd/lb/*.go"
   ],
+  srcsExclude: ["**/*_test.go"],
   // TODO: Додайте запуск тестів для балансувальника.
-   testPkg:"github.com/vladShadow/Architecture-LAB23/cmd/lb"
+  testPkg:"github.com/vladShadow/Architecture-LAB23/cmd/lb",
+  outTestFile: "lbtest.txt"  
 }
 
 // TODO: Додайте модуль для інтеграційних тестів.
 go_binary {
   name: "integration",
   testPkg: "github.com/vladShadow/Architecture-LAB23/integration",
+  optional: true
 } 
